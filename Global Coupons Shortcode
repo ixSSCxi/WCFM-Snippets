@@ -1,0 +1,47 @@
+//Wordpress may be preventing the user id array from calling inside the shortcode.
+//If it does not work for you, make a page template in your child theme and remove the function brackets then it will work fine.
+
+function all_coupons(){
+global $wpdb;
+$users = $wpdb->get_results( "SELECT ID FROM $wpdb->users" );
+$i = 0;
+foreach ( $users as $user ) {
+		$coupon_args = array(
+							'posts_per_page'   => -1,
+							'offset'           => 0,
+							'category'         => '',
+							'category_name'    => '',
+							'orderby'          => 'date',
+							'order'            => 'DESC',
+							'include'          => '',
+							'exclude'          => '',
+							'meta_key'         => 'show_on_store',
+							'meta_value'       => 'yes',
+							'post_type'        => 'shop_coupon',
+							'post_mime_type'   => '',
+							'post_parent'      => '',
+							'author'	   			 => $i,
+							'post_status'      => array('publish'),
+							'suppress_filters' => 0 
+						);
+		$i++;
+		$wcfm_store_coupons = get_posts( $coupon_args );
+		if( empty( $wcfm_store_coupons ) ) return;
+		
+		foreach( $wcfm_store_coupons as $wcfm_store_coupon ) {
+			$wc_coupon = new WC_Coupon( $wcfm_store_coupon->ID );
+			
+			if ( $wc_coupon->get_date_expires() && ( current_time( 'timestamp', true ) > $wc_coupon->get_date_expires()->getTimestamp() ) ) continue;
+			
+			$free_shipping = ( get_post_meta( $wcfm_store_coupon->ID, 'free_shipping', true) == 'yes' ) ? 'enable' : '';
+			
+			if( $free_shipping ) {
+				echo '<span class="wcfmmp-store-coupon-single tips text_tip" data-tip="' . __( 'FREE Shipping Coupon', 'wc-multivendor-marketplace' ) . ($wc_coupon->get_date_expires() ? '<br>' . __( 'Expiry Date: ', 'wc-multivendor-marketplace' ) . $wc_coupon->get_date_expires()->date_i18n( 'F j, Y' ) : '' ) . '<br>' . wp_kses_post($wcfm_store_coupon->post_excerpt) . '">' . wp_kses_post($wcfm_store_coupon->post_title) . '</span>';
+			} else {
+				echo '<span class="wcfmmp-store-coupon-single tips text_tip" data-tip="' . esc_html( wc_get_coupon_type( $wc_coupon->get_discount_type() ) ) . ': ' . esc_html( wc_format_localized_price( $wc_coupon->get_amount() ) ) . ($wc_coupon->get_date_expires() ? '<br>' . __( 'Expiry Date: ', 'wc-multivendor-marketplace' ) . $wc_coupon->get_date_expires()->date_i18n( 'F j, Y' ) : '' ) . '<br>' . wp_kses_post($wcfm_store_coupon->post_excerpt) . '">' . wp_kses_post($wcfm_store_coupon->post_title) . '</span>';
+			}
+			$i++;
+		}
+	}
+}
+add_shortcode('show_all_coupons', 'all_coupons');

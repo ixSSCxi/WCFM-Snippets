@@ -1,6 +1,6 @@
 # WCFM-Snippets
 
-If you find this information helpful, please consider making a donation: paypal.me/ixSSCxi
+If you find this information helpful, please consider making a donation: https://paypal.me/ixSSCxi
 
 These snippets are meant to be used for WCFM.
 

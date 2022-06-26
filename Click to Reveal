@@ -1,0 +1,31 @@
+//I will use the vendor phone number on the vendor page header as an example of how to click to reveal the phone number.
+//Copy wc-multivendor-marketplace/views/store/wcfmmp-view-store-header.php to yourtheme/wcfm/store/wcfmmp-view-store-header.php
+
+//Find the below code
+<a href="tel:<?php echo $phone; ?>"><?php echo $phone; ?></a>
+<?php } else { ?>
+<?php echo $phone; ?>
+                               
+//Replace that code with the following
+<script type="text/javascript">
+
+function displayPara(fieldID, displayBol) {
+
+  var paraObj = document.getElementById(fieldID);
+  var showObj = document.getElementById(fieldID+'_show');
+  var hideObj = document.getElementById(fieldID+'_hide');
+
+  paraObj.style.display = (displayBol)? '' : 'none' ;
+  showObj.style.display = (!displayBol)? '' : 'none' ;
+  hideObj.style.display = (displayBol)? '' : 'none' ;
+
+}
+
+</script>
+
+<a href="#" onclick="displayPara('para1', false);" id="para1_hide" style="display:none;">Hide Phone</a>
+<a href="#" onclick="displayPara('para1', true);" id="para1_show" style="">Show Phone</a>
+<div id="para1" style="display:none;"><a href="tel:<?php echo $phone; ?>"><?php echo $phone; ?></a>
+<?php } else { ?>
+<?php echo $phone; ?>
+<?php } ?></div>
